@@ -2,7 +2,9 @@
 #define NEWTON_METHOD_NEWTON_H
 
 #include <Eigen/Dense>
-#include <iostream>
+
+using Eigen::VectorXd;
+using Eigen::MatrixXd;
 
 class Newton {
 public:
@@ -23,6 +25,20 @@ public:
             u0 = u1;
             u1 = u;
             u = u1 - f(u1) * (u1 - u0) / (f(u1) - f(u0));
+        }
+        return u;
+    }
+
+    VectorXd solve(VectorXd &u0, VectorXd (*f)(VectorXd), MatrixXd (*J)(VectorXd), double epsilon, bool invert = true) {
+        VectorXd u(u0.size());
+        MatrixXd J0 = J(u0).inverse();
+        u = u0 - J0 * f(u0);
+        while ((u - u0).cwiseAbs().maxCoeff() > epsilon) {
+            u0 = u;
+            if (invert)
+                u = u0 - J(u0).inverse() * f(u0);
+            else
+                u = u0 - J0 * f(u0);
         }
         return u;
     }
