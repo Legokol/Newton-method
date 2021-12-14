@@ -10,7 +10,7 @@ class Newton {
 public:
     Newton() {}
 
-    double solve(double u0, double (*f)(double), double (*df)(double), double epsilon) {
+    double solve(double u0, const std::function<double(double)> &f, const std::function<double(double)> &df, double epsilon) {
         double u = u0 - f(u0) / df(u0);
         while (fabs(u - u0) > epsilon) {
             u0 = u;
@@ -19,7 +19,7 @@ public:
         return u;
     }
 
-    double solve(double u0, double u1, double (*f)(double), double epsilon) {
+    double solve(double u0, double u1, const std::function<double(double)> &f, double epsilon) {
         double u = u1 - f(u1) * (u1 - u0) / (f(u1) - f(u0));
         while (fabs(u - u1) > epsilon) {
             u0 = u1;
@@ -29,7 +29,7 @@ public:
         return u;
     }
 
-    VectorXd solve(VectorXd &u0, VectorXd (*f)(VectorXd), MatrixXd (*J)(VectorXd), double epsilon, bool invert = true) {
+    VectorXd solve(VectorXd &u0, const std::function<VectorXd(const VectorXd &)>& f, const std::function<MatrixXd(const VectorXd &)> &J, double epsilon, bool invert = true) {
         VectorXd u(u0.size());
         MatrixXd J0 = J(u0).inverse();
         u = u0 - J0 * f(u0);
